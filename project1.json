@@ -92,7 +92,7 @@
         "id": "060a5913b8f23f2e",
         "type": "inject",
         "z": "f6ed19d4ee618a11",
-        "name": "5 Min Interval",
+        "name": "Inject Earthquake Data",
         "props": [
             {
                 "p": "payload"
@@ -102,14 +102,14 @@
                 "vt": "str"
             }
         ],
-        "repeat": "300",
+        "repeat": "",
         "crontab": "",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 140,
+        "x": 120,
         "y": 280,
         "wires": [
             [
@@ -161,8 +161,8 @@
         "y": 280,
         "wires": [
             [
-                "0574805e9873ef2d",
-                "5038612f5465e7ed"
+                "5038612f5465e7ed",
+                "0574805e9873ef2d"
             ]
         ]
     },
@@ -170,16 +170,16 @@
         "id": "0574805e9873ef2d",
         "type": "debug",
         "z": "f6ed19d4ee618a11",
-        "name": "debug 1",
+        "name": "mag output",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "payload",
+        "complete": "payload.mag",
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
+        "x": 830,
         "y": 280,
         "wires": []
     },
@@ -187,7 +187,7 @@
         "id": "5038612f5465e7ed",
         "type": "switch",
         "z": "f6ed19d4ee618a11",
-        "name": "",
+        "name": "Filter greater than 7",
         "property": "payload.mag",
         "propertyType": "msg",
         "rules": [
@@ -200,7 +200,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 210,
+        "x": 250,
         "y": 340,
         "wires": [
             [
@@ -212,7 +212,7 @@
         "id": "e6f4716538958909",
         "type": "change",
         "z": "f6ed19d4ee618a11",
-        "name": "",
+        "name": "change payload to str",
         "rules": [
             {
                 "t": "set",
@@ -227,7 +227,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 400,
+        "x": 460,
         "y": 340,
         "wires": [
             [
@@ -239,16 +239,35 @@
         "id": "aa190c8d1a3d49bb",
         "type": "debug",
         "z": "f6ed19d4ee618a11",
-        "name": "debug 2",
+        "name": "Display String",
         "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 600,
+        "x": 660,
         "y": 340,
         "wires": []
+    },
+    {
+        "id": "4d10caad6e24da3b",
+        "type": "function",
+        "z": "f6ed19d4ee618a11",
+        "name": "function 1",
+        "func": "if (Array.isArray(msg.payload)) {\n    msg.payload = msg.payload.slice(0, 5);\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 200,
+        "wires": [
+            []
+        ]
     }
 ]
