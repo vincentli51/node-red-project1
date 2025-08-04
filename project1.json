@@ -1,1 +1,254 @@
-[]
+[
+    {
+        "id": "f6ed19d4ee618a11",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c19ac05609a082c8",
+        "type": "inject",
+        "z": "f6ed19d4ee618a11",
+        "name": "ms TimeStamp",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 100,
+        "wires": [
+            [
+                "06091e2a4b874545"
+            ]
+        ]
+    },
+    {
+        "id": "70b7d8a74aaeb717",
+        "type": "debug",
+        "z": "f6ed19d4ee618a11",
+        "name": "Date Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "06091e2a4b874545",
+        "type": "function",
+        "z": "f6ed19d4ee618a11",
+        "name": "dateToString",
+        "func": "// Create a Date object from the payload\nvar date = new Date(msg.payload);\n// Change the payload to be a formatted Date string\nmsg.payload = date.toString();\n// Return the message so it can be sent on\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 100,
+        "wires": [
+            [
+                "70b7d8a74aaeb717"
+            ]
+        ]
+    },
+    {
+        "id": "44b18cfd68c3d8b0",
+        "type": "catch",
+        "z": "f6ed19d4ee618a11",
+        "name": "",
+        "scope": [
+            "06091e2a4b874545"
+        ],
+        "uncaught": false,
+        "x": 130,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "060a5913b8f23f2e",
+        "type": "inject",
+        "z": "f6ed19d4ee618a11",
+        "name": "5 Min Interval",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 280,
+        "wires": [
+            [
+                "4c048b35aa6f0a21"
+            ]
+        ]
+    },
+    {
+        "id": "4c048b35aa6f0a21",
+        "type": "http request",
+        "z": "f6ed19d4ee618a11",
+        "name": "Earthquake searcher",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.csv",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 340,
+        "y": 280,
+        "wires": [
+            [
+                "765d5bcaed82c2de"
+            ]
+        ]
+    },
+    {
+        "id": "765d5bcaed82c2de",
+        "type": "csv",
+        "z": "f6ed19d4ee618a11",
+        "name": "",
+        "spec": "rfc",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "one",
+        "ret": "\\r\\n",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 510,
+        "y": 280,
+        "wires": [
+            [
+                "0574805e9873ef2d",
+                "5038612f5465e7ed"
+            ]
+        ]
+    },
+    {
+        "id": "0574805e9873ef2d",
+        "type": "debug",
+        "z": "f6ed19d4ee618a11",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "5038612f5465e7ed",
+        "type": "switch",
+        "z": "f6ed19d4ee618a11",
+        "name": "",
+        "property": "payload.mag",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gte",
+                "v": "7",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 210,
+        "y": 340,
+        "wires": [
+            [
+                "e6f4716538958909"
+            ]
+        ]
+    },
+    {
+        "id": "e6f4716538958909",
+        "type": "change",
+        "z": "f6ed19d4ee618a11",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "PANIC!",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 340,
+        "wires": [
+            [
+                "aa190c8d1a3d49bb"
+            ]
+        ]
+    },
+    {
+        "id": "aa190c8d1a3d49bb",
+        "type": "debug",
+        "z": "f6ed19d4ee618a11",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 340,
+        "wires": []
+    }
+]
