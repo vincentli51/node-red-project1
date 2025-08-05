@@ -2,10 +2,17 @@
     {
         "id": "f6ed19d4ee618a11",
         "type": "tab",
-        "label": "Flow 1",
+        "label": "Earthquake Tutorial",
         "disabled": false,
         "info": "",
         "env": []
+    },
+    {
+        "id": "a90a2a89c445690b",
+        "type": "tab",
+        "label": "Heating/Cooling Degree Days",
+        "disabled": false,
+        "info": "This flow calculates heating and cooling degree days from a weather API and displays them on a dashboard."
     },
     {
         "id": "c19ac05609a082c8",
@@ -74,21 +81,6 @@
         ]
     },
     {
-        "id": "44b18cfd68c3d8b0",
-        "type": "catch",
-        "z": "f6ed19d4ee618a11",
-        "name": "",
-        "scope": [
-            "06091e2a4b874545"
-        ],
-        "uncaught": false,
-        "x": 130,
-        "y": 180,
-        "wires": [
-            []
-        ]
-    },
-    {
         "id": "060a5913b8f23f2e",
         "type": "inject",
         "z": "f6ed19d4ee618a11",
@@ -109,7 +101,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 120,
+        "x": 160,
         "y": 280,
         "wires": [
             [
@@ -133,7 +125,7 @@
         "authType": "",
         "senderr": false,
         "headers": [],
-        "x": 340,
+        "x": 380,
         "y": 280,
         "wires": [
             [
@@ -157,7 +149,7 @@
         "strings": true,
         "include_empty_strings": "",
         "include_null_values": "",
-        "x": 510,
+        "x": 550,
         "y": 280,
         "wires": [
             [
@@ -200,7 +192,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 250,
+        "x": 290,
         "y": 340,
         "wires": [
             [
@@ -227,7 +219,7 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 460,
+        "x": 500,
         "y": 340,
         "wires": [
             [
@@ -248,7 +240,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
+        "x": 700,
         "y": 340,
         "wires": []
     },
@@ -269,5 +261,109 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "e9392e21b777a421",
+        "type": "inject",
+        "z": "a90a2a89c445690b",
+        "name": "Trigger Daily",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "86400",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "New York",
+        "payloadType": "str",
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "45d0a68d06c54784"
+            ]
+        ]
+    },
+    {
+        "id": "45d0a68d06c54784",
+        "type": "function",
+        "z": "a90a2a89c445690b",
+        "name": "Construct API URL",
+        "func": "// Get the API key from the global context, which is set via a system environment variable.\n// This is a best practice to avoid hardcoding secrets in your code.\nconst apiKey = global.get('api_key');\n\n// Check if the API key is available\nif (!apiKey) {\n    node.error(\"API Key not found in global context. Please set the WEATHER_API_KEY environment variable.\");\n    return null; // Stop the flow if the key is missing\n}\n\nconst days = 3; // free tier provides 3 days of forecast\n\n// Get the city from the incoming message, defaulting to a specific city if not provided\nconst city = msg.payload || \"New York\";\n\n// Construct the URL for the API request for a 3-day forecast\nconst apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=${days}`;\n\n// Set the URL in the message and pass it on\nmsg.url = apiUrl;\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 140,
+        "wires": [
+            [
+                "c099c27771f28b7e"
+            ]
+        ]
+    },
+    {
+        "id": "c099c27771f28b7e",
+        "type": "http request",
+        "z": "a90a2a89c445690b",
+        "name": "Get Weather Data",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 640,
+        "y": 140,
+        "wires": [
+            [
+                "b1b46a585721869e",
+                "85b939d223edca5a"
+            ]
+        ]
+    },
+    {
+        "id": "b1b46a585721869e",
+        "type": "json",
+        "z": "a90a2a89c445690b",
+        "name": "Parse JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 840,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "85b939d223edca5a",
+        "type": "debug",
+        "z": "a90a2a89c445690b",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 840,
+        "y": 260,
+        "wires": []
     }
 ]
